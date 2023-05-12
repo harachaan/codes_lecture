@@ -1,0 +1,1 @@
+      parameter(MAXNODE=1000,MAXELEM=1000,MAXBC=100)

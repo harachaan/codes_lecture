@@ -1,0 +1,2 @@
+ the result of pi.f90:    3.14159165358977     
+ the number of terms:      1000000
