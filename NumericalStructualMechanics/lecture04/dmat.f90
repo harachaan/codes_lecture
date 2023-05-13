@@ -76,11 +76,10 @@ subroutine inp(nnode, ndof, nelem, x, y, thick, lnods, e, vnu)
 
     ndof = 2 * nnode ! 総自由度数（未知変位成分の数）
 
-    write(*,*) nelem
     do lelem = 1, nelem
         read(3, *) lnods(1:3, lelem) ! 要素を構成する節点のリスト（必ず反時計回り？）
     end do
-    write(*,*) lnods(1:3, 1)
+
     return
 end
 
@@ -107,12 +106,10 @@ subroutine bmat(lelem, b, x, y, lnods)
         inode = lnods(m, lelem)
         xe(1, m) = x(inode) ! 対象要素のx座標を格納
         xe(2, m) = y(inode) ! 対象要素のy座標を格納
-        write(*,*) lnods(1, 1)
     end do
-    write(*,*) xe
     
     Ax2 = xe(1, 2) * xe(2, 3) + xe(1, 1) * xe(2, 2) + xe(1, 3) * xe(2, 1) - xe(1, 2) * xe(2, 2) - xe(1, 3) * xe(2, 2) - xe(1, 1) * xe(2, 3)! 式(8)の計算
-    !write(*,*) Ax2
+    
     b(1:3, 1:6) = 0.D0 ! 初期化
     ! 脳筋代入
     b(1, 1) = (xe(2, 2) - xe(2, 3)) / Ax2
@@ -131,7 +128,6 @@ subroutine bmat(lelem, b, x, y, lnods)
 
     do m = 1, 3
         write(4, 100) b(m, 1:6) ! bmatをbmat.txtに記述
-        
     end do
     100 format(6(E12.4, ','))
 

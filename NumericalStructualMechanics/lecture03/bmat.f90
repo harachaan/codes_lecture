@@ -7,7 +7,7 @@
 !       - inp_concentrated-f_triangle.txt
 !       - param.inc
 !   - lecture03 (curdir)
-!       - homework03.f90
+!       - bmat.f90
 !       
 ! ----------------------------------------------------------------------
 
