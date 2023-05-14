@@ -62,7 +62,7 @@ subroutine inp(nnode, ndof, nelem, x, y, thick, lnods, e, vnu)
     
 
     ! 機械的特性
-    e = 200D3 ! ヤング率, [MPa], `D3`は10^3を表す
+    e = 200D3! ヤング率, [MPa]=[N/mm^2], `D3`は10^3を表す
     vnu = 0.4D0 ! ポアソン比[-]
 
     thick = 1.D0
@@ -166,7 +166,7 @@ subroutine dmat(d, e, vnu)
     d(2, 1) = vnu
     d(2, 2) = 1
     d(3, 3) = (1 - vnu) / 2
-    d = d / dCoef
+    d = dCoef * d
 
     do m = 1, 3
         write(5, 100) d(m, 1:3) ! dmatをdmat.txtに記述
