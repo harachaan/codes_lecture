@@ -35,9 +35,9 @@ program FEM_triangle_element
     call inp(NNODE, NDOF, NELEM, X, Y, THICK, LNODS, E, VNU) ! 座標系，パラメータのinput
     close(3)
 
-    ! call dmat(D, E, VNU) ! dmat 作成
+    call dmat(D, E, VNU) ! dmat 作成
 
-    do lelem = 1, 5
+    do lelem = 1, NELEM
         call bmat(lelem, B, X, Y, LNODS) ! bmat 作成 
     end do 
 
@@ -62,8 +62,8 @@ subroutine inp(nnode, ndof, nelem, x, y, thick, lnods, e, vnu)
     
 
     ! 機械的特性
-    e = 200D3 ! `D3`は10^3を表す
-    vnu = 0.4D0
+    e = 200D3 ! ヤング率, [MPa], `D3`は10^3を表す
+    vnu = 0.4D0 ! ポアソン比[-]
 
     thick = 1.D0
 
@@ -124,6 +124,20 @@ subroutine bmat(lelem, b, x, y, lnods)
     b(3, 4) = (xe(2, 3) - xe(2, 1)) / Ax2
     b(3, 5) = (xe(1, 3) - xe(1, 1)) / Ax2
     b(3, 6) = (xe(2, 1) - xe(2, 2)) / Ax2
+
+    ! なんかあとからbmatをAx2で割ろうとするとエラー出る．なんで．．
+    ! b(1, 1) = (xe(2, 2) - xe(2, 3))
+    ! b(1, 3) = (xe(2, 3) - xe(2, 1))
+    ! b(1, 5) = (xe(2, 1) - xe(2, 2))
+    ! b(2, 2) = (xe(1, 3) - xe(1, 2))
+    ! b(2, 4) = (xe(1, 1) - xe(1, 3))
+    ! b(2, 6) = (xe(1, 2) - xe(1, 1))
+    ! b(3, 1) = (xe(1, 3) - xe(1, 2))
+    ! b(3, 2) = (xe(2, 2) - xe(2, 3))
+    ! b(3, 3) = (xe(1, 1) - xe(1, 3))
+    ! b(3, 4) = (xe(2, 3) - xe(2, 1))
+    ! b(3, 5) = (xe(1, 3) - xe(1, 1))
+    ! b(3, 6) = (xe(2, 1) - xe(2, 2))
     ! b = b / Ax2
 
     do m = 1, 3
@@ -136,9 +150,31 @@ end
 
 ! ---------------------------------------------------------------------
 !   create D matrix (for each element)
-!       - D matrix：shape=(3, 3)
+!       - D matrix：shape=(3, 3), 応力-ひずみ間形式の行列
 ! ---------------------------------------------------------------------
+subroutine dmat(d, e, vnu)
+    implicit none
 
+    integer :: m
+    double precision :: d(3,3), e, vnu, dCoef
+
+    ! 資料04の式(12)をそのまま
+    dCoef = e / (1 - vnu**2)
+    d(1:3, 1:3) = 0.D0 ! 初期化
+    d(1, 1) = 1
+    d(1, 2) = vnu
+    d(2, 1) = vnu
+    d(2, 2) = 1
+    d(3, 3) = (1 - vnu) / 2
+    d = d / dCoef
+
+    do m = 1, 3
+        write(5, 100) d(m, 1:3) ! dmatをdmat.txtに記述
+    end do 
+    100 format(6(E12.4, ','))
+
+    return
+end
 
 
 
