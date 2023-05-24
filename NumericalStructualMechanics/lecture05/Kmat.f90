@@ -140,7 +140,7 @@ subroutine bmat(lelem, b, x, y, lnods)
     b(3, 2) = (xe(2, 2) - xe(2, 3)) / Ax2
     b(3, 3) = (xe(1, 1) - xe(1, 3)) / Ax2
     b(3, 4) = (xe(2, 3) - xe(2, 1)) / Ax2
-    b(3, 5) = (xe(1, 3) - xe(1, 1)) / Ax2
+    b(3, 5) = (xe(1, 2) - xe(1, 1)) / Ax2
     b(3, 6) = (xe(2, 1) - xe(2, 2)) / Ax2
 
     ! なんかあとからbmatをAx2で割ろうとするとエラー出る．なんで．．
@@ -181,13 +181,23 @@ subroutine dmat(d, e, vnu)
 
 
     ! 資料04の式(12)をそのまま
-    dCoef = e / (1 - vnu**2)
+    ! dCoef = e / (1 - vnu**2)
+    ! d(1:3, 1:3) = 0.D0 ! 初期化
+    ! d(1, 1) = 1
+    ! d(1, 2) = vnu
+    ! d(2, 1) = vnu
+    ! d(2, 2) = 1
+    ! d(3, 3) = (1 - vnu) / 2
+    ! d = dCoef * d
+
+    ! 資料04の式(6)をべたうち
+    dCoef = e / (1 - 2 * vnu) / (1 + vnu)
     d(1:3, 1:3) = 0.D0 ! 初期化
-    d(1, 1) = 1
+    d(1, 1) = 1 - vnu
     d(1, 2) = vnu
     d(2, 1) = vnu
-    d(2, 2) = 1
-    d(3, 3) = (1 - vnu) / 2
+    d(2, 2) = 1 - vnu
+    d(3, 3) = (1 - 2 * vnu) / 2
     d = dCoef * d
 
     do m = 1, 3
@@ -215,6 +225,7 @@ subroutine mergekmat(tk, lelem, lnods, b, x, y, d, thick, ndof)
         ! for do文
 
     ! 要素剛性[dk]と全体剛性[tk]の対応関係
+    ip(1:6) = 0.D0 ! 初期化
     do inode = 1, 3 ! 要素の3個の節点
         node_no = lnods(inode, lelem) ! 対象節点の番号
         do idof = 1, 2 ! 自由度（degree of freedom）
@@ -256,7 +267,8 @@ subroutine mergekmat(tk, lelem, lnods, b, x, y, d, thick, ndof)
     ! 要素番号1--5の要素剛性matを記述したい
     if (lelem .le. 5) then
         write(6, *) '要素番号', lelem, 'の要素剛性'
-        write(6, *) dk
+        write(6, 100) dk
+        100 format(6(E12.4, ','))
     end if
 
 
