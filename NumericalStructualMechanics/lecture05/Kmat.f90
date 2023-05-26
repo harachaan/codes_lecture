@@ -48,7 +48,7 @@ program FEM_triangle_element
 
     do lelem = 1, nelem
         call bmat(lelem, B, X, Y, LNODS) ! bmat 作成
-        call mergekmat(TK, lelem, LNODS, B, X, Y, D, THICK, NDOF)
+        call mergekmat(TK, lelem, LNODS, B, X, Y, D, THICK, MAXNODE)
     end do
 
     write(7, *) 'TK(i, i)'
@@ -212,13 +212,13 @@ end
 !   create K matrix (for each element)
 !       - D matrix：shape=(3, 3), 応力-ひずみ間形式の行列
 ! ---------------------------------------------------------------------
-subroutine mergekmat(tk, lelem, lnods, b, x, y, d, thick, ndof)
+subroutine mergekmat(tk, lelem, lnods, b, x, y, d, thick, maxnode)
     implicit none
 
-    integer :: lelem, lnods(3, *), node_no, ip(6), ndof
+    integer :: lelem, lnods(3, *), node_no, ip(6), maxnode
         ! lelem: 対象要素の要素番号, lnods: 対象要素の節点のリスト, node_no: 対象節点の番号, 
         ! ip(6): 要素剛性matの行・列と，全体剛性matに組み込む場所の対応関係, db(3, 6): [D][B]を一時記憶
-    double precision :: thick, Ax2, Ae, x(*), y(*), xe(2, 3), b(3, 6), d(3, 3), db(3, 6), dk(6, 6), tk(ndof, ndof)
+    double precision :: thick, Ax2, Ae, x(*), y(*), xe(2, 3), b(3, 6), d(3, 3), db(3, 6), dk(6, 6), tk(2*maxnode, 2*maxnode)
         ! thick: 厚さ, Ae: 要素の面積, Ax2: Aeの2倍
 
     integer :: inode, idof, i, j, k, m
