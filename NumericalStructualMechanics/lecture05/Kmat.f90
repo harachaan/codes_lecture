@@ -126,7 +126,7 @@ subroutine bmat(lelem, b, x, y, lnods)
         xe(2, m) = y(inode) ! 対象要素のy座標を格納
     end do
 
-    Ax2 = xe(1, 2) * xe(2, 3) + xe(1, 1) * xe(2, 2) + xe(1, 3) * xe(2, 1) - xe(1, 2) * xe(2, 2) - xe(1, 3) * xe(2, 2) - xe(1, 1) * xe(2, 3)! 式(8)の計算
+    Ax2 = xe(1, 2) * xe(2, 3) + xe(1, 1) * xe(2, 2) + xe(1, 3) * xe(2, 1) - xe(1, 2) * xe(2, 1) - xe(1, 3) * xe(2, 2) - xe(1, 1) * xe(2, 3)! 式(8)の計算
     
     b(1:3, 1:6) = 0.D0 ! 初期化
     ! 脳筋代入
@@ -240,8 +240,8 @@ subroutine mergekmat(tk, lelem, lnods, b, x, y, d, thick, maxnode)
         xe(2, m) = y(inode) ! 対象要素のy座標を格納
     end do
 
-    Ax2 = xe(1, 2) * xe(2, 3) + xe(1, 1) * xe(2, 2) + xe(1, 3) * xe(2, 1) - xe(1, 2) * xe(2, 2) - xe(1, 3) * xe(2, 2) - xe(1, 1) * xe(2, 3)  ! 式(8)の計算
-    Ae = Ax2 / 2 ! 要素の面積の2倍
+    Ax2 = xe(1, 2) * xe(2, 3) + xe(1, 1) * xe(2, 2) + xe(1, 3) * xe(2, 1) - xe(1, 2) * xe(2, 1) - xe(1, 3) * xe(2, 2) - xe(1, 1) * xe(2, 3)  ! 式(8)の計算
+    Ae = Ax2 / 2.D0 ! 要素の面積の2倍
 
     ! まず，[D(3, 3)][B(3, 6)]を計算し，[db(3, 6)]に記憶
     do i = 1, 3 ! dbの行
