@@ -12,8 +12,9 @@ c
       include 'param.inc'
 c
       dimension X(MAXNODE),Y(MAXNODE),LNODS(3,MAXELEM),B(3,6)
-      dimension D(3,3),TK(2*MAXNODE,2*MAXNODE)
+      dimension D(3,3),TK(2*MAXNODE,2*MAXNODE),U(2*MAXNODE)
       dimension P(2*MAXNODE),I_BC_GIVEN(MAXBC),V_BC_GIVEN(MAXBC)
+      dimension STRAIN(3,MAXELEM),STRESS(3,MAXELEM)
 c
       open(2,file='rst.txt')
       open(3,file='inp_concentrated-f_triangle.txt')
@@ -21,7 +22,6 @@ c
       call inp(NNODE,NDOF,NELEM,X,Y,THICK,LNODS,E,VNU,
      &         P,N_BC_GIVEN,I_BC_GIVEN,V_BC_GIVEN)
       close(3)
-c
       call dmat(D,E,VNU)
 c
       TK(1:NDOF,1:NDOF) = 0.D0   ! initialize
@@ -33,9 +33,21 @@ c
 c
       call bound(TK,P,NDOF,N_BC_GIVEN,I_BC_GIVEN,V_BC_GIVEN)
 c
-      write(2,*) 'TK(i,i),P(i)'
-      do i=1,NDOF
-        write(2,'(2F12.4)') TK(i,i),P(i)
+      call gauss2(TK,U,P,NDOF)
+c
+      write(2,*) 'U(i)'
+      do inode=1,NNODE
+        write(2,'(I5,2E15.7)') inode,U(2*inode-1),U(2*inode)
+      end do
+c
+      do lelem=1,NELEM
+        call bmat(lelem,B,X,Y,LNODS)
+        call calc_stress(lelem,STRAIN,STRESS,B,D,U,LNODS)
+      end do
+c
+      write(2,*) 'STRESS'
+      do lelem=1,NELEM
+        write(2,'(I5,3E15.7)') lelem,STRESS(1:3,lelem)
       end do
 c
       close(2)
